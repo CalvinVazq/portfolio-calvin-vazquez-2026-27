@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
 
 type Pixel = { x: number; y: number; vx: number; vy: number; size: number; born: number; life: number };
 
@@ -15,6 +16,33 @@ export function CustomCursor() {
     if (!canvas || !cursor) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+    const paths = Array.from(cursor.querySelectorAll<SVGPathElement>('path'));
+    const morph = { progress: 0 };
+    let interactive = false;
+    const renderCursor = () => {
+      const t = morph.progress;
+      const mix = (a: number, b: number) => a + (b - a) * t;
+      const radius = 15, arm = 9, control = radius * .55228475;
+      // Each straight ray bends into one quarter of the circular outline.
+      const arcs = [
+        [[0,-radius],[control,-radius],[radius,-control],[radius,0]],
+        [[radius,0],[radius,control],[control,radius],[0,radius]],
+        [[0,radius],[-control,radius],[-radius,control],[-radius,0]],
+        [[-radius,0],[-radius,-control],[-control,-radius],[0,-radius]],
+      ];
+      const tips = [[arm,0],[0,arm],[-arm,0],[0,-arm]];
+      paths.forEach((path, index) => {
+        const [start, c1, c2, end] = arcs[index];
+        const tip = tips[index];
+        path.setAttribute('d', `M ${16 + mix(0,start[0])} ${16 + mix(0,start[1])} C ${16 + mix(0,c1[0])} ${16 + mix(0,c1[1])} ${16 + mix(tip[0],c2[0])} ${16 + mix(tip[1],c2[1])} ${16 + mix(tip[0],end[0])} ${16 + mix(tip[1],end[1])}`);
+      });
+    };
+    const setInteractive = (next: boolean) => {
+      if (interactive === next) return;
+      interactive = next;
+      gsap.to(morph, { progress: next ? 1 : 0, duration: .5, ease: 'power3.inOut', overwrite: true, onUpdate: renderCursor });
+    };
+    renderCursor();
     const preference = window.matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)');
     let particles: Pixel[] = [];
     let last: { x: number; y: number; time: number } | null = null;
@@ -51,7 +79,9 @@ export function CustomCursor() {
     };
     const hide = () => {
       document.documentElement.classList.remove('custom-cursor-active');
-      cursor.classList.remove('is-visible', 'is-interactive');
+      cursor.classList.remove('is-visible');
+      gsap.killTweensOf(morph);
+      interactive = false; morph.progress = 0; renderCursor();
       last = null;
     };
     const move = (event: PointerEvent) => {
@@ -62,7 +92,7 @@ export function CustomCursor() {
       cursor.classList.add('is-visible');
       document.documentElement.classList.add('custom-cursor-active');
       const target = event.target instanceof Element ? event.target : null;
-      cursor.classList.toggle('is-interactive', !!target?.closest('a, button, input, textarea, select, [role="button"], [contenteditable="true"]'));
+      setInteractive(!!target?.closest('a[href], button, input, textarea, select, summary, [role="button"], [role="link"], [role="checkbox"], [tabindex]:not([tabindex="-1"]), [contenteditable="true"], .paper-motion'));
       const now = performance.now();
       if (last) {
         const dx = x - last.x, dy = y - last.y;
@@ -120,5 +150,5 @@ export function CustomCursor() {
     return () => { preference.removeEventListener('change', updatePreference); disable(); };
   }, []);
 
-  return <><canvas ref={canvasRef} className="cursor-trail" aria-hidden="true"/><div ref={cursorRef} className="custom-cursor" aria-hidden="true"><span/></div></>;
+  return <><canvas ref={canvasRef} className="cursor-trail" aria-hidden="true"/><div ref={cursorRef} className="custom-cursor" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="white" strokeWidth="1.5"><path/><path/><path/><path/></svg></div></>;
 }
