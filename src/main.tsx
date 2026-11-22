@@ -28,11 +28,51 @@ const projects=[
 ];
 const projectImages=['/assets/ucl-apercu.png','/assets/mercedes-apercu.png','/assets/aubore-apercu.png','/assets/velia-apercu.png','/assets/street-workout-apercu.png','/assets/stilla-apercu.png','/assets/tennis-lucens-apercu.png','/assets/aubonne-apercu.png','/assets/crossfit-apercu.png',img('photo-1552664730-d307ca884978'),img('photo-1557200134-90327ee9fafa')];
 const services=[['01','CRÉATIVITÉ','Imaginer des concepts uniques qui sortent des standards.','/assets/qualite-creativite.webp'],['02','RIGUEUR','Soigner chaque détail, de la première idée au résultat final.','/assets/qualite-rigueur.webp'],['03','ADAPTABILITÉ',"M’adapter à chaque projet, chaque univers et chaque défi.",'/assets/qualite-adaptabilite.webp'],['04','AUTONOMIE','Gérer un projet de A à Z, avec méthode et efficacité.','/assets/qualite-autonomie.webp']];
-function Navbar({project=false}:{project?:boolean}){const prefix=project?'/':'';return createPortal(<header className="hero-nav">
-  <div className="hero-available"><span/>DISPONIBLE POUR PROJET</div>
-  <nav className="hero-nav-pill" aria-label="Navigation principale"><a href={`${prefix}#expertise`}>EXPERTISE</a><a href={`${prefix}#works`}>PROJETS</a><a href={`${prefix}#top`} className="hero-brand" aria-label="Retour à l'accueil"><img src="/assets/calvin-logo.png" alt=""/></a><a href={`${prefix}#references`}>RÉFÉRENCES</a><a href={`${prefix}#contact`}>CONTACT</a></nav>
-  <a className="hero-contact" href="mailto:contact@calvinvazquez.ch"><span>CONTACT@CALVINVAZQUEZ.CH</span><i><ArrowUpRight aria-hidden="true"/></i></a>
-  </header>, document.body)}
+function Navbar({project=false}:{project?:boolean}){
+  const prefix=project?'/':'';
+  const [menuOpen,setMenuOpen]=useState(false);
+  const menuRef=useRef<HTMLDivElement>(null);
+  const toggleRef=useRef<HTMLButtonElement>(null);
+  useLayoutEffect(()=>{
+    if(!menuOpen)return;
+    const previousOverflow=document.body.style.overflow;
+    document.body.style.overflow='hidden';
+    menuRef.current?.querySelector<HTMLButtonElement>('button')?.focus();
+    const onKeyDown=(event:KeyboardEvent)=>{
+      if(event.key==='Escape'){setMenuOpen(false);toggleRef.current?.focus();return}
+      if(event.key!=='Tab')return;
+      const items=menuRef.current?.querySelectorAll<HTMLElement>('a[href], button:not([disabled])');
+      if(!items?.length)return;
+      const first=items[0],last=items[items.length-1];
+      if(event.shiftKey && document.activeElement===first){event.preventDefault();last.focus()}
+      else if(!event.shiftKey && document.activeElement===last){event.preventDefault();first.focus()}
+    };
+    const onResize=()=>{if(window.innerWidth>700)setMenuOpen(false)};
+    document.addEventListener('keydown',onKeyDown);
+    window.addEventListener('resize',onResize);
+    return()=>{document.body.style.overflow=previousOverflow;document.removeEventListener('keydown',onKeyDown);window.removeEventListener('resize',onResize)};
+  },[menuOpen]);
+  const closeMenu=()=>setMenuOpen(false);
+  return createPortal(<>
+    <header className="hero-nav">
+      <div className="hero-available"><span/><strong>DISPONIBLE POUR PROJET</strong></div>
+      <nav className="hero-nav-pill" aria-label="Navigation principale"><a href={prefix+'#expertise'}>EXPERTISE</a><a href={prefix+'#works'}>PROJETS</a><a href={prefix+'#top'} className="hero-brand" aria-label="Retour à l'accueil"><img src="/assets/calvin-logo.png" alt=""/></a><a href={prefix+'#references'}>RÉFÉRENCES</a><a href={prefix+'#contact'}>CONTACT</a></nav>
+      <a className="hero-contact" href="mailto:contact@calvinvazquez.ch"><span>CONTACT@CALVINVAZQUEZ.CH</span><i><ArrowUpRight aria-hidden="true"/></i></a>
+      <button ref={toggleRef} className="mobile-menu-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded={menuOpen} aria-controls="mobile-menu" onClick={()=>setMenuOpen(true)}><span/><span/><span/></button>
+    </header>
+    <span className="availability-dot" aria-hidden="true"/>
+    <div ref={menuRef} id="mobile-menu" className={`mobile-menu${menuOpen?' is-open':''}`} role="dialog" aria-modal={menuOpen?true:undefined} aria-label="Menu de navigation" aria-hidden={!menuOpen} inert={!menuOpen} data-lenis-prevent>
+      <div className="mobile-menu-top"><span>MENU</span><button className="mobile-menu-close" type="button" aria-label="Fermer le menu" onClick={()=>{closeMenu();toggleRef.current?.focus()}}><span/><span/></button></div>
+      <nav className="mobile-menu-links" aria-label="Navigation mobile">
+        <a href={prefix+'#expertise'} onClick={closeMenu}>Expertise <ArrowUpRight aria-hidden="true"/></a>
+        <a href={prefix+'#works'} onClick={closeMenu}>Projets <ArrowUpRight aria-hidden="true"/></a>
+        <a href={prefix+'#references'} onClick={closeMenu}>Références <ArrowUpRight aria-hidden="true"/></a>
+        <a href={prefix+'#contact'} onClick={closeMenu}>Contact <ArrowUpRight aria-hidden="true"/></a>
+      </nav>
+      <div className="mobile-menu-bottom"><span>RÉSEAUX SOCIAUX</span><div><span>INSTAGRAM</span><span>TIKTOK</span><span>LINKEDIN</span></div></div>
+    </div>
+  </>,document.body)
+}
 function Header(){
   const heroRef = useRef<HTMLElement>(null);
   useLayoutEffect(() => {
@@ -74,8 +114,8 @@ function Header(){
   }, []);
   return <section className="hero" ref={heroRef}>
     <Navbar/>
-    <div className="hero-meta"><span>BRANDING&nbsp; / &nbsp;PHOTO&nbsp; / &nbsp;VIDÉO&nbsp; / &nbsp;UI/UX&nbsp; / &nbsp;DÉVELOPPEMENT</span><span>PORTFOLIO 2026 — 2027</span></div>
-    <h1>CALVIN VAZQUEZ</h1>
+    <div className="hero-meta"><span className="hero-disciplines"><span>BRANDING</span><i>/</i><span>PHOTO</span><i>/</i><span>VIDÉO</span><i>/</i><span>UI/UX</span><i>/</i><span>DÉVELOPPEMENT</span></span><span className="hero-meta-year">PORTFOLIO 2026 — 2027</span></div>
+    <h1><span>CALVIN</span>{' '}<span>VAZQUEZ</span></h1>
     <div className="hero-portrait"><div className="portrait-scroll"><div className="portrait-interaction"><div className="hero-arc"/><div className="hero-backdrop"/><div className="hero-photo-motion"><img className="hero-photo" src={photos.portrait} alt="Portrait de Calvin Vazquez"/></div><span className="hero-cross">+</span></div></div></div>
     <div className="hero-project"><div className="hero-project-label"><span/>PROJET SÉLECTIONNÉ</div><a href="/projets/velia" className="hero-project-preview" aria-label="Voir le projet Velia"><img src="/assets/velia-apercu.png" alt="Aperçu du projet Velia"/></a><div className="hero-project-caption"><span>Velia — Branding fitness coaching &amp; site web</span><a href="/projets/velia" aria-label="Voir le projet Velia"><ArrowUpRight aria-hidden="true"/></a></div></div>
     <div className="hero-about" id="about"><span className="hero-badge"><i/>DESIGNER DIGITAL</span><p>Je donne vie aux idées<br/>{' '}à travers des expériences<br/>{' '}<em>créatives, uniques et mémorables.</em></p><a href="#expertise" className="hero-cta">MES EXPERTISES <ArrowUpRight aria-hidden="true"/></a></div>
@@ -127,7 +167,7 @@ function Capability(){
   return <section className="capability" id="expertise" ref={section} aria-label="My expertise"><div className="cap-bg" aria-hidden="true">SKILLS &amp; EXPERTISE</div><div className="paper-stack">{expertise.map((item, i) => <article className="sheet main-sheet expertise-card" key={i}><small>MON EXPERTISE / 0{i + 1}—07</small><h2>{item.title}</h2><p>{item.description}</p><div className="paper-tags">{item.tags.map(tag => <span key={tag}>{tag}</span>)}</div></article>)}</div><p className="cap-caption">De la première idée à sa réalisation,<br/>je donne vie à vos projets à travers le design, la technologie et la créativité.</p></section>
 }
 
-function Works(){const navigate=useNavigate();const [active,setActive]=useState<number | null>(null);const [lastActive,setLastActive]=useState(0);const selectProject=(i:number)=>{setLastActive(i);setActive(i)};const [imageOffset,setImageOffset]=useState(0);const listRef=useRef<HTMLDivElement>(null);useLayoutEffect(()=>{const list=listRef.current;if(!list)return;const update=()=>{const rows=list.querySelectorAll<HTMLElement>('.project-row');if(active !== null && rows[active] && rows[0])setImageOffset(rows[active].offsetTop-rows[0].offsetTop)};update();const observer=new ResizeObserver(update);observer.observe(list);return()=>observer.disconnect()},[active]);return <section className="works section-pad" id="works"><div className="works-heading"><h2>PROJETS<br/>À LA UNE</h2><p>PROJETS RÉALISÉS<br/><span>2021 — 2026</span></p></div><div className="project-list" ref={listRef} style={{"--image-offset": `${imageOffset}px`} as React.CSSProperties}><div className={`project-image ${active === null ? 'is-hidden' : ''}`} aria-hidden={active === null}><img src={projectImages[lastActive]} alt={`Featured project: ${projects[lastActive].title}`}/><span>↗</span></div>{projects.map((p,i)=><button className={`project-row ${active===i?'active':''}`} key={p.title} id={`project-${i+1}`} onMouseEnter={()=>selectProject(i)} onMouseLeave={()=>setActive(null)} onFocus={()=>selectProject(i)} onBlur={()=>setActive(null)} onClick={()=>{selectProject(i);navigate('/projets/'+projectSlugs[i]);window.scrollTo(0,0)}}><span>{p.title} <sup>0{i+1}</sup></span><small>{p.client}</small></button>)}</div><a className="view-all" href="#contact">DÉCOUVRIR TOUS LES PROJETS ↗</a></section>}
+function Works(){const navigate=useNavigate();const [active,setActive]=useState<number | null>(null);const [lastActive,setLastActive]=useState(0);const selectProject=(i:number)=>{setLastActive(i);setActive(i)};const [imageOffset,setImageOffset]=useState(0);const listRef=useRef<HTMLDivElement>(null);useLayoutEffect(()=>{const list=listRef.current;if(!list)return;const update=()=>{const rows=list.querySelectorAll<HTMLElement>('.project-row');if(active !== null && rows[active] && rows[0])setImageOffset(rows[active].offsetTop-rows[0].offsetTop)};update();const observer=new ResizeObserver(update);observer.observe(list);return()=>observer.disconnect()},[active]);return <section className="works section-pad" id="works"><div className="works-heading"><h2>PROJETS<br/>À LA UNE</h2><p>PROJETS RÉALISÉS<br/><span>2021 — 2026</span></p></div><div className="project-list" ref={listRef} style={{"--image-offset": `${imageOffset}px`} as React.CSSProperties}><div className={`project-image ${active === null ? 'is-hidden' : ''}`} aria-hidden={active === null}><img src={projectImages[lastActive]} alt={`Featured project: ${projects[lastActive].title}`}/><span>↗</span></div>{projects.map((p,i)=><button className={`project-row ${active===i?'active':''}`} key={p.title} id={`project-${i+1}`} onMouseEnter={()=>selectProject(i)} onMouseLeave={()=>setActive(null)} onFocus={()=>selectProject(i)} onBlur={()=>setActive(null)} onClick={()=>{selectProject(i);navigate('/projets/'+projectSlugs[i]);window.scrollTo(0,0)}}><img className="project-thumbnail" src={projectImages[i]} alt="" loading="lazy"/><span className="project-copy"><span className="project-title">{p.title} <sup>0{i+1}</sup></span><small>{p.client}</small></span><ArrowUpRight className="project-arrow" aria-hidden="true"/></button>)}</div><a className="view-all" href="#contact">DÉCOUVRIR TOUS LES PROJETS ↗</a></section>}
 function ServiceCard({ item, index }: { item: string[]; index: number }) {
   const paperRef = useRef<HTMLDivElement>(null);
   const physics = useRef({ angle: 0, velocity: 0, force: 0, impulse: 0, frame: 0, time: 0, pointerX: 0, pointerTime: 0, active: false });
@@ -193,7 +233,7 @@ function Services(){
     const wrapper = panel?.closest<HTMLElement>('.works-services');
     if (!panel || !wrapper) return;
     const media = gsap.matchMedia();
-    media.add('(prefers-reduced-motion: no-preference)', () => {
+    media.add('(min-width: 701px) and (prefers-reduced-motion: no-preference)', () => {
       const animation = gsap.fromTo(panel, { xPercent: 100 }, {
         xPercent: 0, ease: 'none',
         scrollTrigger: { trigger: wrapper, start: 'top top', end: 'bottom bottom', scrub: true, invalidateOnRefresh: true },
@@ -241,7 +281,7 @@ function Contact(){
           <div className="tags">{contactTags.map(t=><button type="button" aria-pressed={selected.includes(t)} className={selected.includes(t)?'chosen':''} onClick={()=>{setSelected(selected.includes(t)?selected.filter(x=>x!==t):[...selected,t]);setSelectionError(false)}} key={t}>{t}</button>)}</div>
           {selectionError&&<p id="services-error" className="contact-error" role="alert">Choisissez au moins une prestation.</p>}
         </fieldset>
-        <h3>PARLEZ-MOI DE VOTRE PROJET.</h3><p>Une idée, un projet ou une envie de collaboration ? Discutons ensemble de vos besoins.</p>
+        <div className="contact-intro"><h3>PARLEZ-MOI DE VOTRE PROJET.</h3><p>Une idée, un projet ou une envie de collaboration ? Discutons ensemble de vos besoins.</p></div>
         <div className="fields">
           <label>NOM ET PRÉNOM *<input required maxLength={120} name="name" autoComplete="name" placeholder="Votre nom complet"/></label>
           <label>ADRESSE E-MAIL *<input required maxLength={254} name="email" type="email" autoComplete="email" placeholder="votre@email.ch"/></label>
@@ -274,7 +314,7 @@ function SmoothScroll(){
   return null;
 }
 const referenceLogos=[['Vaudoise','reference-9.png','vaudoise'],['Union Communale Lucens','reference-1.png','ucl'],['Aubore','reference-3.png','aubore'],['Velia','velia-wordmark.png','velia'],['Swiss Street Workout','swiss-street-workout-rouge.png','street'],['Tennis Club de Lucens','reference-6.png','tennis'],['Stilla Oils','reference-5.png','stilla'],['FSG','reference-7.png','fsg'],['Piamotors','piamotors-detoure.png','piamotors']];
-function Home(){useLayoutEffect(()=>{if(window.location.hash){requestAnimationFrame(()=>document.getElementById(decodeURIComponent(window.location.hash.slice(1)))?.scrollIntoView())}},[]);return <><SmoothScroll/><CustomCursor/><div id="top"/><Header/><main><Capability/><Works/><div className="works-services" id="references"><div className="transition-frame"><div className="logos-stage"><div className="logo-grid">{referenceLogos.map(([name,file,id],i)=><div key={id} className={`logo logo-${i} logo-${id}`}><img src={`/assets/logos/${file}`} alt={name} loading="lazy"/></div>)}</div></div><Services/></div></div><Contact/></main><Footer/></>};
+function Home(){useLayoutEffect(()=>{if(window.location.hash){requestAnimationFrame(()=>document.getElementById(decodeURIComponent(window.location.hash.slice(1)))?.scrollIntoView())}},[]);return <><SmoothScroll/><CustomCursor/><div id="top"/><Header/><main><Capability/><Works/><div className="works-services" id="references"><div className="transition-frame"><div className="logos-stage"><div className="logos-intro"><span aria-hidden="true"/><h2>ILS M’ONT FAIT<br/>CONFIANCE</h2><p>Entreprises, marques et organisations avec lesquelles j’ai pu collaborer.</p></div><div className="logo-grid">{referenceLogos.map(([name,file,id],i)=><div key={id} className={`logo logo-${i} logo-${id}`}><img src={`/assets/logos/${file}`} alt={name} loading="lazy"/></div>)}</div></div><Services/></div></div><Contact/></main><Footer/></>};
 
 function App(){return <BrowserRouter><Routes><Route path="/" element={<Home/>}/><Route path="/projets/:slug" element={<><SmoothScroll/><CustomCursor/><Navbar project/><ProjectPage/></>}/></Routes></BrowserRouter>}
 
