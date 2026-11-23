@@ -8,6 +8,8 @@
 /cotecoeurcotejardin/* https://portfolio-calvin-vazquez.vercel.app/cotecoeurcotejardin/:splat 200
 /GaragedeBeaumont https://portfolio-calvin-vazquez.vercel.app/GaragedeBeaumont 200
 /GaragedeBeaumont/* https://portfolio-calvin-vazquez.vercel.app/GaragedeBeaumont/:splat 200
+/GaragedeSch%C3%B6nberg https://portfolio-calvin-vazquez.vercel.app/GaragedeSch%C3%B6nberg 200
+/GaragedeSch%C3%B6nberg/* https://portfolio-calvin-vazquez.vercel.app/GaragedeSch%C3%B6nberg/:splat 200
 /GaragedeSchönberg https://portfolio-calvin-vazquez.vercel.app/GaragedeSch%C3%B6nberg 200
 /GaragedeSchönberg/* https://portfolio-calvin-vazquez.vercel.app/GaragedeSch%C3%B6nberg/:splat 200
 /sites/schonberg/* https://portfolio-calvin-vazquez.vercel.app/sites/schonberg/:splat 200
