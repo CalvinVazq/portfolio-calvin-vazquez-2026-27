@@ -26,7 +26,7 @@ const projects=[
   {title:'PRODUCTION PHOTO ÉVÉNEMENTIELLE', client:"Soirée de gym d'Aubonne"},
   {title:'TRAILER VIDÉO CROSSFIT', client:'Swiss Police Throwdown'},
 ];
-const projectImages=['/assets/ucl-apercu.png','/assets/mercedes-apercu.png','/assets/aubore-apercu.png','/assets/velia-apercu.png','/assets/street-workout-apercu.png','/assets/stilla-apercu.png','/assets/tennis-lucens-apercu.png','/assets/aubonne-apercu.png','/assets/crossfit-apercu.png',img('photo-1552664730-d307ca884978'),img('photo-1557200134-90327ee9fafa')];
+const projectImages=['/projects/05-union-communale-lucens/gallery/brochure-lucens.webp','/assets/mercedes-apercu.png','/assets/aubore-apercu.png','/assets/velia-apercu.png','/assets/street-workout-apercu.png','/assets/stilla-apercu.png','/assets/tennis-lucens-apercu.png','/assets/aubonne-apercu.png','/assets/crossfit-apercu.png',img('photo-1552664730-d307ca884978'),img('photo-1557200134-90327ee9fafa')];
 const services=[['01','CRÉATIVITÉ','Imaginer des concepts uniques qui sortent des standards.','/assets/qualite-creativite.webp'],['02','RIGUEUR','Soigner chaque détail, de la première idée au résultat final.','/assets/qualite-rigueur.webp'],['03','ADAPTABILITÉ',"M’adapter à chaque projet, chaque univers et chaque défi.",'/assets/qualite-adaptabilite.webp'],['04','AUTONOMIE','Gérer un projet de A à Z, avec méthode et efficacité.','/assets/qualite-autonomie.webp']];
 function Navbar({project=false}:{project?:boolean}){
   const prefix=project?'/':'';
