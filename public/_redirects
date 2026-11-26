@@ -17,4 +17,6 @@
 /warmup/* https://portfolio-calvin-vazquez.vercel.app/warmup/:splat 200
 /creperie https://portfolio-calvin-vazquez.vercel.app/creperie 200
 /creperie/* https://portfolio-calvin-vazquez.vercel.app/creperie/:splat 200
+/acropole /acropole/index.html 200
+/acropole/* /acropole/index.html 200
 /* /index.html 200
